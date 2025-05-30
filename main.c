@@ -1,18 +1,31 @@
-    AREA DivisionExample, CODE, READONLY
-    ENTRY
+.global _start
+_start:
+	
+	start:
+    MOV     R0, #24      
+    MOV     R1, #4        
 
-start
-    MOV     R0, #37      ; dividend
-    MOV     R1, #5       ; divisor
+    MOV     R2, #0       
+    MOV     R3, #32       
 
-    UDIV    R2, R0, R1   ; R2 = quotient = R0 / R1
-    MLS     R3, R2, R1, R0  ; R3 = remainder = R0 - (R2 * R1)
+div_loop:
+    CMP     R3, #0
+    BEQ     div_done
 
-    ; Now:
-    ; R2 contains quotient (7)
-    ; R3 contains remainder (2)
+    LSL     R2, R2, #1
+    MOV     R4, R0, LSR #31
+    ORR     R2, R2, R4
+    LSL     R0, R0, #1
 
-stop
-    B stop              ; infinite loop to stop program
+    CMP     R2, R1
+    BLT     skip_subtract
+    SUB     R2, R2, R1
+    ORR     R0, R0, #1
 
-    END
+skip_subtract:
+    SUBS    R3, R3, #1
+    B       div_loop
+
+div_done:
+stop:
+    B stop
